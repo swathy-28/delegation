@@ -1,0 +1,32 @@
+specVersion: "4.0"
+metadata:
+  name: delegation
+type: application
+server:
+  customMiddleware:
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertErrors: false
+        ui5:
+          path:
+            - /resources
+            - /test-resources
+          url: https://ui5.sap.com
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        flp:
+          theme: sap_horizon
+    - name: ui5-middleware-simpleproxy
+      afterMiddleware: compression
+      mountPath: /odata/delegation
+      configuration:
+        baseUri: https://st-logistics-pte-ltd-stl-dev-build-auto-au-sjrflf26-dev4270780a.cfapps.ap10.hana.ondemand.com/delegation
+        strictSSL: false

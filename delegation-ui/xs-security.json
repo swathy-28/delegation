@@ -1,0 +1,7 @@
+{
+  "xsappname": "delegation",
+  "tenant-mode": "dedicated",
+  "description": "Security profile of the unified Delegation app",
+  "scopes": [],
+  "role-templates": []
+}

@@ -1,0 +1,126 @@
+<mvc:View
+    controllerName="delegation.controller.DelegationPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page
+        id="pageDelegation"
+        title="{app>/pageTitle}"
+        showHeader="false">
+
+        <content>
+            <VBox
+                id="vboxAdmDelegationMain"
+                class="sapUiSmallMarginBeginEnd"
+                width="98%">
+
+                <!-- Top Toolbar -->
+                <Toolbar id="tbAdmDelegationHeader">
+                    <Title id="titleAdmDelegationPage" text="{app>/pageTitle}"/>
+                    <ToolbarSpacer id="tbSpacerAdmDelegation"/>
+                    <Button
+                        id="btnAdmCreateDelegation"
+                        text="Create Delegation"
+                        type="Emphasized"
+                        press=".onCreateDelegation"/>
+                </Toolbar>
+
+                <!-- Search / Filter Row -->
+                <HBox id="hboxAdmDelegationSearchRow" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title id="titleAdmDelegationsList" text="Delegations" level="H2"/>
+                    <HBox id="hboxAdmDelegationSearchControls">
+                        <Button id="btnAdmDelegationClearFilter"
+                            icon="sap-icon://clear-filter"
+                            press=".clearFilters"
+                            tooltip="Clear Filters"
+                            class="sapUiTinyMarginBegin"/>
+                        <Button id="btnAdmDelegationRefresh"
+                            icon="sap-icon://refresh"
+                            press=".onRefresh"
+                            class="sapUiTinyMarginBegin"/>
+                    </HBox>
+                </HBox>
+
+                <!-- Tabs -->
+                <IconTabBar
+                    id="idAdmIconTabBar"
+                    expandable="false"
+                    select=".onTabSelect">
+                    <items>
+                        <IconTabFilter id="tabAdmDelegationAll"     key="ALL"     text="All"/>
+                        <IconTabFilter id="tabAdmDelegationActive"  key="ACTIVE"  text="Active"/>
+                        <IconTabFilter id="tabAdmDelegationFuture"  key="FUTURE"  text="Future"/>
+                        <IconTabFilter id="tabAdmDelegationExpired" key="EXPIRED" text="Expired"/>
+                    </items>
+                </IconTabBar>
+
+                <Table
+                    id="tblAdmDelegation"
+                    mode="SingleSelectLeft"
+                    growing="true"
+                    growingScrollToLoad="true"
+                    growingThreshold="10"
+                    autoPopinMode="true"
+                    items="{delegation>/Delegations}">
+
+                    <columns>
+                        <Column id="colAdmDelegator"       width="15%" minScreenWidth="Tablet" demandPopin="true"><header><Text id="txtAdmColHeaderDelegator" text="Delegator"/></header></Column>
+                        <Column id="colAdmDelegateUser"    width="15%" minScreenWidth="Tablet" demandPopin="true"><header><Text id="txtAdmColHeaderDelegateUser" text="Delegate User"/></header></Column>
+                        <Column id="colAdmApplication"     width="12%"  minScreenWidth="Tablet" demandPopin="true"><header><Text id="txtAdmColHeaderApplication" text="Application"/></header></Column>
+                        <Column id="colAdmValidFrom"       width="8%"  minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtAdmColHeaderValidFrom" text="Valid From"/></header></Column>
+                        <Column id="colAdmValidTo"         width="8%"  minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtAdmColHeaderValidTo" text="Valid To"/></header></Column>
+                        <Column id="colAdmReason"          width="11%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtAdmColHeaderReason" text="Delegation Reason"/></header></Column>
+                        <Column id="colAdmStatus"          width="5%"><header><Text id="txtAdmColHeaderStatus" text="Status"/></header></Column>
+                        <!-- Audit columns - now shown in BOTH Admin and My Delegation, as requested -->
+                        <Column id="colAdmCreatedBy"       width="15%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtAdmColHeaderCreatedBy" text="Created By"/></header></Column>
+                        <Column id="colAdmCreatedAt"       width="13%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtAdmColHeaderCreatedAt" text="Created At"/></header></Column>
+                        <Column id="colAdmUpdatedAt"       width="13%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtAdmColHeaderUpdatedAt" text="Updated At"/></header></Column>
+                        <!-- Only meaningful/shown for Admins: which UI created the row -->
+                        <Column id="colAdmAction"          width="8%"  hAlign="Center"><header><Text id="txtAdmColHeaderAction" text="Action"/></header></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem id="cliAdmDelegationRow" type="Active">
+                            <cells>
+                                <Text id="txtAdmCellDelegator" text="{delegation>delegator}" tooltip="{delegation>delegator}" wrapping="false"/>
+                                <Text id="txtAdmCellDelegateUser" text="{delegation>delegateUser}" wrapping="false"/>
+                                <Text id="txtAdmCellApplication" text="{delegation>application}" wrapping="false"/>
+                                <Text id="txtAdmCellValidFrom" text="{
+                                        path: 'delegation>validFrom',
+                                        type: 'sap.ui.model.type.Date',
+                                        formatOptions: { source: { pattern: 'yyyy-MM-dd' }, style: 'medium' }
+                                    }" wrapping="false"/>
+                                <Text id="txtAdmCellValidTo" text="{
+                                        path: 'delegation>validTo',
+                                        type: 'sap.ui.model.type.Date',
+                                        formatOptions: { source: { pattern: 'yyyy-MM-dd' }, style: 'medium' }
+                                    }" wrapping="false"/>
+                                <Text id="txtAdmCellReason" text="{delegation>delegationReason}" wrapping="false"/>
+                                <ObjectStatus id="osAdmCellStatus"
+                                    text="{delegation>status}"
+                                    state="{= ${delegation>status} === 'Active' ? 'Success' : ${delegation>status} === 'Future' ? 'Warning' : ${delegation>status} === 'Expired' ? 'Error' : 'None' }"/>
+                                <Text id="txtAdmCellCreatedBy" text="{delegation>createdBy}" wrapping="false"/>
+                                <Text id="txtAdmCellCreatedAt" text="{
+                                        path: 'delegation>createdAt',
+                                        formatter: '.formatTimestamp'
+                                    }" wrapping="false"/>
+                                <Text id="txtAdmCellUpdatedAt" text="{
+                                        path: 'delegation>updatedAt',
+                                        formatter: '.formatTimestamp'
+                                    }" wrapping="false"/>
+                                <HBox id="hboxAdmCellActions" justifyContent="Center">
+                                    <Button id="btnAdmCellEdit" icon="sap-icon://edit" type="Transparent" tooltip="Edit" press=".onEditDelegation"/>
+                                    <Button id="btnAdmCellDelete" icon="sap-icon://delete" type="Transparent" tooltip="Delete" press=".onDeleteDelegation"/>
+                                </HBox>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+
+                </Table>
+            </VBox>
+        </content>
+
+    </Page>
+
+</mvc:View>

@@ -1,0 +1,80 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form">
+
+    <Dialog
+        id="dlgDelegationForm"
+        title="Create Delegation"
+        contentWidth="30rem">
+
+        <content>
+            <form:SimpleForm
+                id="formDelegation"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                class="stlDelegationForm">
+
+                <Label id="lblDelegator" text="Delegator" required="true"/>
+                <!-- Admin: free text, can delegate on behalf of anyone.
+                     Approver / NormalUser: locked to their own email. -->
+                <Input id="inpDelegator"
+                    value="{delegationEdit>/delegator}"
+                    editable="{app>/isAdmin}"/>
+
+                <Label id="lblDelegateUser" text="Delegate User" required="true"/>
+                <Input id="inpDelegateUser" value="{delegationEdit>/delegateUser}"/>
+
+                <Label id="lblApplication" text="Application" required="true"/>
+                <MultiComboBox
+                    id="selApplication"
+                    width="100%"
+                    selectedKeys="{delegationEdit>/application}">
+                    <core:Item id="_IDGenItem1" key="CAF" text="CAF"/>
+                    <core:Item id="_IDGenItem2" key="eVendor" text="eVendor"/>
+                    <core:Item id="_IDGenItem3" key="eBG" text="eBG"/>
+                    <core:Item id="_IDGenItem4" key="ePR" text="ePR"/>
+                </MultiComboBox>
+
+                <Label id="lblValidFrom" text="Valid From" required="true"/>
+                <DatePicker
+                    id="dpValidFrom"
+                    value="{
+                        path: 'delegationEdit>/validFrom',
+                        type: 'sap.ui.model.type.Date',
+                        formatOptions: { source: { pattern: 'yyyy-MM-dd' } }
+                    }"
+                    change=".onValidFromChange"/>
+
+                <Label id="lblValidTo" text="Valid To" required="true"/>
+                <DatePicker
+                    id="dpValidTo"
+                    value="{
+                        path: 'delegationEdit>/validTo',
+                        type: 'sap.ui.model.type.Date',
+                        formatOptions: { source: { pattern: 'yyyy-MM-dd' } }
+                    }"/>
+
+                <Label id="lblReason" text="Delegation Reason" required="true"/>
+                <TextArea id="txtReason" rows="3" value="{delegationEdit>/delegationReason}"/>
+
+            </form:SimpleForm>
+        </content>
+
+        <beginButton>
+            <Button
+                id="btnSubmitDelegation"
+                text="Submit"
+                type="Emphasized"
+                press=".onSubmitDelegation"/>
+        </beginButton>
+        <endButton>
+            <Button
+                id="btnCancelDelegation"
+                text="Cancel"
+                press=".onCancelDelegation"/>
+        </endButton>
+
+    </Dialog>
+
+</core:FragmentDefinition>

@@ -1,0 +1,124 @@
+<mvc:View
+    controllerName="delegation.controller.MyDelegation"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page
+        id="pagemydelegation"
+        title="My Delegation"
+        showHeader="false">
+
+        <content>
+            <VBox
+                id="vboxMyDlgMain"
+                width="100%">
+
+                <!-- Top Toolbar -->
+                <Toolbar id="tbMyDlgHeader">
+                    <Title id="titleMyDlgPage" text="My Delegation"/>
+                    <ToolbarSpacer id="tbSpacerMyDlg"/>
+                    <Button
+                        id="btnMyDlgCreateDelegation"
+                        text="Create Delegation"
+                        type="Emphasized"
+                        press=".onCreateDelegation"/>
+                </Toolbar>
+                <!-- Search / Filter Row -->
+                <HBox id="hboxMyDlgSearchRow" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom sapUiSmallMarginTop">
+                    <Title id="titleMyDlgList" text="Delegations" level="H2"/>
+                    <HBox id="hboxMyDlgSearchControls">
+                        <Button id="btnMyDlgClearFilter"
+                            icon="sap-icon://clear-filter"
+                            press=".clearFilters"
+                            tooltip="Clear Filters"
+                            class="sapUiTinyMarginBegin"/>
+                        <Button id="btnMyDlgRefresh"
+                            icon="sap-icon://refresh"
+                            press=".onRefresh"
+                            class="sapUiTinyMarginBegin"/>
+                    </HBox>
+                </HBox>
+
+                <!-- Tabs -->
+                <IconTabBar
+                    id="idMyDlgIconTabBar"
+                    expandable="false"
+                    select=".onTabSelect">
+                    <items>
+                        <IconTabFilter id="tabMyDlgAll"     key="ALL"     text="All"/>
+                        <IconTabFilter id="tabMyDlgActive"  key="ACTIVE"  text="Active"/>
+                        <IconTabFilter id="tabMyDlgFuture"  key="FUTURE"  text="Future"/>
+                        <IconTabFilter id="tabMyDlgExpired" key="EXPIRED" text="Expired"/>
+                    </items>
+                </IconTabBar>
+
+                <Table
+                    id="tblMyDlgDelegation"
+                    width="100%"
+                    mode="SingleSelectLeft"
+                    growing="true"
+                    growingScrollToLoad="true"
+                    growingThreshold="10"
+                    autoPopinMode="true"
+                    items="{delegation>/Delegations}">
+
+                    <columns>
+                        <Column id="colMyDlgDelegator"    width="15%" minScreenWidth="Tablet" demandPopin="true"><header><Text id="txtMyDlgColHeaderDelegator" text="Delegator"/></header></Column>
+                        <Column id="colMyDlgDelegateUser" width="15%" minScreenWidth="Tablet" demandPopin="true"><header><Text id="txtMyDlgColHeaderDelegateUser" text="Delegate User"/></header></Column>
+                        <Column id="colMyDlgApplication"  width="12%"  minScreenWidth="Tablet" demandPopin="true" hAlign="Center"><header><Text id="txtMyDlgColHeaderApplication" text="Application"/></header></Column>
+                        <Column id="colMyDlgValidFrom"    width="8%"  minScreenWidth="Desktop" demandPopin="true" hAlign="Center"><header><Text id="txtMyDlgColHeaderValidFrom" text="Valid From"/></header></Column>
+                        <Column id="colMyDlgValidTo"      width="8%"  minScreenWidth="Desktop" demandPopin="true" hAlign="Center"><header><Text id="txtMyDlgColHeaderValidTo" text="Valid To"/></header></Column>
+                        <Column id="colMyDlgReason"       width="11%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtMyDlgColHeaderReason" text="Delegation Reason"/></header></Column>
+                        <Column id="colMyDlgStatus"       width="5%"  hAlign="Center"><header><Text id="txtMyDlgColHeaderStatus" text="Status"/></header></Column>
+                        <Column id="colMyDlgCreatedBy"    width="15%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtMyDlgColHeaderCreatedBy" text="Created By"/></header></Column>
+                        <Column id="colMyDlgCreatedAt"    width="13%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtMyDlgColHeaderCreatedAt" text="Created At"/></header></Column>
+                        <Column id="colMyDlgUpdatedAt"    width="13%" minScreenWidth="Desktop" demandPopin="true"><header><Text id="txtMyDlgColHeaderUpdatedAt" text="Updated At"/></header></Column>
+                        <Column id="colMyDlgAction"       width="8%"  hAlign="Center"><header><Text id="txtMyDlgColHeaderAction" text="Action"/></header></Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem id="cliMyDlgRow" type="Active">
+                            <cells>
+                                <Text id="txtMyDlgCellDelegator" text="{delegation>delegator}" tooltip="{delegation>delegator}" wrapping="true"/>
+                                <Text id="txtMyDlgCellDelegateUser" text="{delegation>delegateUser}" wrapping="false"/>
+                                <Text id="txtMyDlgCellApplication" text="{delegation>application}"  wrapping="false" textAlign="Center"/>
+                                <Text id="txtMyDlgCellValidFrom" text="{
+                                        path: 'delegation>validFrom',
+                                        type: 'sap.ui.model.type.Date',
+                                        formatOptions: { source: { pattern: 'yyyy-MM-dd' }, style: 'medium' }
+                                    }" wrapping="false" textAlign="Center"/>
+                                <Text id="txtMyDlgCellValidTo" text="{
+                                        path: 'delegation>validTo',
+                                        type: 'sap.ui.model.type.Date',
+                                        formatOptions: { source: { pattern: 'yyyy-MM-dd' }, style: 'medium' }
+                                    }" wrapping="false" textAlign="Center"/>
+                                <Text id="txtMyDlgCellReason" text="{delegation>delegationReason}"  wrapping="false"/>
+                                <ObjectStatus id="osMyDlgCellStatus"
+                                    text="{delegation>status}"
+                                    state="{= ${delegation>status} === 'Active' ? 'Success' : ${delegation>status} === 'Future' ? 'Warning' : ${delegation>status} === 'Expired' ? 'Error' : 'None' }"/>
+                                <Text id="txtMyDlgCellCreatedBy" text="{delegation>createdBy}" wrapping="false"/>
+                                <Text id="txtMyDlgCellCreatedAt" text="{
+                                        path: 'delegation>createdAt',
+                                        formatter: '.formatTimestamp'
+                                    }" wrapping="false"/>
+                                <Text id="txtMyDlgCellUpdatedAt" text="{
+                                        path: 'delegation>updatedAt',
+                                        formatter: '.formatTimestamp'
+                                    }" wrapping="false"/>
+                                <HBox id="hboxMyDlgCellActions" justifyContent="Center">
+                                    <Button id="btnMyDlgCellEdit" icon="sap-icon://edit"   type="Transparent" tooltip="Edit"   press=".onEditDelegation"/>
+                                    <Button id="btnMyDlgCellDelete" icon="sap-icon://delete" type="Transparent" tooltip="Delete" press=".onDeleteDelegation"/>
+                                </HBox>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+
+                </Table>
+            </VBox>
+        </content>
+
+    </Page>
+
+</mvc:View>

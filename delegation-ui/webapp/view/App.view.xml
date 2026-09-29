@@ -1,0 +1,10 @@
+<mvc:View controllerName="delegation.controller.App"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <App id="app">
+        <pages>
+            <mvc:XMLView id="_IDGenXMLView" viewName="delegation.view.DelegationPage"/>
+        </pages>
+    </App>
+</mvc:View>

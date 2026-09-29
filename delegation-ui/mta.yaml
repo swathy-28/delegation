@@ -1,0 +1,130 @@
+_schema-version: "3.2"
+ID: delegation
+description: Unified Delegation UI (Admin Delegation + My Delegation)
+version: 1.0.0
+
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+
+modules:
+  - name: delegation
+    type: html5
+    path: .
+    build-parameters:
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      build-result: dist
+      supported-platforms: []
+
+  - name: delegation-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: delegation-repo-host
+        parameters:
+          content-target: true
+
+    build-parameters:
+      build-result: resources
+      requires:
+        - name: delegation
+          artifacts:
+            - delegation.zip
+          target-path: resources/
+
+  - name: delegation-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: delegation-destination-service
+        parameters:
+          content-target: true
+      - name: delegation-repo-host
+        parameters:
+          service-key:
+            name: delegation-repo-host-key
+      - name: delegation-uaa
+        parameters:
+          service-key:
+            name: delegation-uaa-key
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: delegation_html_repo_host
+              ServiceInstanceName: delegation-html5-service
+              ServiceKeyName: delegation-repo-host-key
+              sap.cloud.service: delegation
+            - Name: delegation_uaa
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: delegation-xsuaa-service
+              ServiceKeyName: delegation-uaa-key
+              sap.cloud.service: delegation
+          existing_destinations_policy: update
+    build-parameters:
+      no-source: true
+
+  - name: delegation-router
+    type: approuter.nodejs
+    path: router
+
+    parameters:
+      memory: 256M
+      disk-quota: 512M
+
+    requires:
+      # delegation-uaa removed — auth is disabled (xs-app.json: authenticationMethod: none),
+      # so the router no longer needs an xsuaa binding for login/token validation.
+      - name: delegation-destination-service   # still needed for the "ui5" destination (resources/test-resources)
+      - name: delegation-repo-runtime
+
+resources:
+  - name: delegation-repo-host
+    type: org.cloudfoundry.managed-service
+
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+      service-name: delegation-html5-service
+
+  - name: delegation-repo-runtime
+    type: org.cloudfoundry.managed-service
+
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
+      service-name: delegation-html5-runtime
+
+  - name: delegation-destination-service
+    type: org.cloudfoundry.managed-service
+
+    parameters:
+      service: destination
+      service-plan: lite
+      service-name: delegation-destination-service
+
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+
+        init_data:
+          instance:
+            existing_destinations_policy: update
+
+            destinations:
+              - Name: ui5
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+                URL: https://ui5.sap.com
+
+  - name: delegation-uaa
+    type: org.cloudfoundry.managed-service
+
+    parameters:
+      service: xsuaa
+      service-plan: application
+      service-name: delegation-xsuaa-service
+      path: ./xs-security.json
