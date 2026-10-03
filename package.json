@@ -25,10 +25,10 @@
       },
       "db": {
         "[production]": {
-          "kind": "postgres",
-          "schema": "delegation",
-          "schema_evolution": true
-        },
+        "kind": "postgres",
+        "schema_evolution": true,
+        "credentials": { "schema": "delegation" }
+      },
         "[development]": {
           "kind": "sqlite",
           "credentials": { "url": "db.sqlite" }
