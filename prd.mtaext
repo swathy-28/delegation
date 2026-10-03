@@ -1,0 +1,11 @@
+_schema-version: 3.3.0
+ID: delegation-cap-prd
+extends: delegation-cap
+resources:
+  - name: STL-postgres
+    parameters:
+      service-name: SAP_STL_POSTGRESQL_DB_PRD
+  - name: delegation-cap-auth
+    parameters:
+      config:
+        xsappname: delegation-cap-prd
