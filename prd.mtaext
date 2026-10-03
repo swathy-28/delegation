@@ -9,3 +9,7 @@ resources:
     parameters:
       config:
         xsappname: delegation-cap-prd
+modules:
+  - name: delegation-cap-srv
+    properties:
+      ALLOWED_ORIGINS: "https://btp-production-47dwy6mj.launchpad.cfapps.ap10.hana.ondemand.com"
