@@ -1,6 +1,15 @@
 {
   "xsappname": "delegation-cap",
   "tenant-mode": "dedicated",
-  "scopes": [],
-  "role-templates": []
+  "scopes": [
+    { "name": "$XSAPPNAME.DelegationAdmin", "description": "Manage all delegations" }
+  ],
+  "role-templates": [
+    { "name": "DelegationAdmin", "description": "Delegation administrator",
+      "scope-references": ["$XSAPPNAME.DelegationAdmin"] }
+  ],
+  "role-collections": [
+    { "name": "STL_Delegation_Admin", "description": "Delegation administrators",
+      "role-template-references": ["$XSAPPNAME.DelegationAdmin"] }
+  ]
 }
