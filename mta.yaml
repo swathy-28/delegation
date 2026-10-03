@@ -1,0 +1,71 @@
+_schema-version: 3.3.0
+ID: delegation-cap
+version: 1.0.0
+description: "Unified Delegation CAP service (Admin Delegation + My Delegation merged)"
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+modules:
+  - name: delegation-cap-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: delegation-cap-auth
+      - name: STL-postgres
+
+  # ---------------------------------------------------------------------
+  # One-off schema deploy task. This module must NEVER run as a normal
+  # long-lived web process — its job is to execute `cds-deploy` once
+  # during deployment and then stay stopped. Without a `tasks:` block,
+  # MTA/CF has no way to distinguish "run once and exit" from "crashed
+  # web app that needs restarting", which is what caused CF to keep
+  # crash-restarting this module and re-running `cds-deploy` every time
+  # it exited (even on Exit status 0) — silently wiping the Delegations
+  # table on every restart cycle.
+  # ---------------------------------------------------------------------
+  - name: delegation-cap-postgres-deployer
+    type: nodejs
+    path: gen/pg
+    parameters:
+      buildpack: nodejs_buildpack
+      no-route: true
+      no-start: true          # never start this as a persistent app
+      memory: 256M
+      disk-quota: 512M
+      tasks:
+        - name: deploy-to-postgresql
+          command: npm start   # runs the existing cds-deploy script once, as a CF task
+          memory: 256M
+    build-parameters:
+      builder: npm
+    requires:
+      - name: STL-postgres
+
+resources:
+  - name: delegation-cap-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: delegation-cap-dev
+        tenant-mode: dedicated
+  # Reuses the SAME existing Postgres instance the two original apps
+  # already pointed at - this is what gives us one shared database.
+  - name: STL-postgres
+    type: org.cloudfoundry.existing-service

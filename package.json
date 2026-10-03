@@ -1,0 +1,52 @@
+{
+  "name": "delegation-cap",
+  "version": "1.0.0",
+  "description": "Unified Delegation CAP project (Admin Delegation + My Delegation merged into one service/table).",
+  "dependencies": {
+    "@cap-js/postgres": "^2",
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4",
+    "cors": "^2.8.6",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2.4",
+    "@sap/cds-dk": "^9"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "private": true,
+  "cds": {
+    "requires": {
+      "auth": {
+        "[production]": { "kind": "xsuaa" },
+        "[development]": { "kind": "dummy" }
+      },
+      "db": {
+        "[production]": {
+          "kind": "postgres",
+          "schema": "delegation",
+          "schema_evolution": true
+        },
+        "[development]": {
+          "kind": "sqlite",
+          "credentials": { "url": "db.sqlite" }
+        }
+      },
+      "connectivity": true,
+      "destinations": true
+    },
+    "server": {
+      "cors": false,
+      "csrf": { "enabled": false }
+    },
+    "build": {
+      "target": "gen",
+      "tasks": [
+        { "for": "nodejs", "src": "srv" },
+        { "for": "postgres" }
+      ]
+    }
+  }
+}
