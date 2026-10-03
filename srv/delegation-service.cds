@@ -1,7 +1,12 @@
 using delegation as db from '../db/schema';
 
-service DelegationService @(path: '/delegation') {
+service DelegationService @(path: '/delegation', requires: 'authenticated-user') {
 
+  @restrict: [
+    { grant: '*', to: 'DelegationAdmin' },
+    { grant: ['READ','CREATE','UPDATE','DELETE','activate','deactivate'],
+      to: 'authenticated-user' }
+  ]
   entity Delegations as projection on db.Delegations actions {
     action activate();
     action deactivate();
